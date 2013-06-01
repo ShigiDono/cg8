@@ -17,7 +17,19 @@ buffer_t::buffer_t(GLuint attribute, GLfloat *vertices, unsigned int count, unsi
     glBufferData(GL_ARRAY_BUFFER, count * sizeof(GLfloat), vertices, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
 }
 
+buffer_t::buffer_t(GLushort *indices, unsigned int count, unsigned int size): attribute(-1), count(count) {
+    glGenBuffers( 1, &buffer );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffer );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, count*sizeof(unsigned short), 
+			      indices, GL_STATIC_DRAW );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+}
+
 void buffer_t::bind() {
+    if (attribute == (GLuint)-1) {
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, buffer );
+        return;
+    }
     glEnableVertexAttribArray(attribute);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	glVertexAttribPointer(
@@ -48,9 +60,22 @@ void model_t::draw(glm::mat4 matrix, GLuint primitive_kind, GLuint count) {
         buffers[i]->bind();
     }
     glDrawArrays(primitive_kind, 0, count); // 3 indices starting at 0 -> 1 triangle
-
+    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, 0);
 }
 
+void model_t::draw_indexed(glm::mat4 matrix, GLuint primitive_kind, GLuint count) {
+
+    shader->bind();
+    shader->apply_model_matrix(matrix);
+    shader->apply_normal_matrix(glm::inverseTranspose(glm::mat3(matrix)));
+
+
+    for (int i = 0; i < buffers.size(); ++i) {
+        buffers[i]->bind();
+    }
+    //glDrawArrays(primitive_kind, 0, count); // 3 indices starting at 0 -> 1 triangle
+    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, 0);
+}
 shader_t::shader_t(const char * vertex_file_path,const char * fragment_file_path){
  
     // Create the shaders
@@ -127,6 +152,7 @@ shader_t::shader_t(const char * vertex_file_path,const char * fragment_file_path
     program = ProgramID;
     projection_matrix = glGetUniformLocation(ProgramID, "projection_matrix");;
     model_view_matrix = glGetUniformLocation(ProgramID, "model_view_matrix");;
+    normal_matrix = glGetUniformLocation(ProgramID, "normal_matrix");;
 }
 
 void shader_t::bind() {
@@ -143,4 +169,8 @@ void shader_t::set_view_matrix(const glm::mat4 &matrix) {
 
 void shader_t::apply_model_matrix(const glm::mat4 &matrix) {
     glUniformMatrix4fv(model_view_matrix, 1, GL_FALSE, &matrix[0][0]);
+}
+
+void shader_t::apply_normal_matrix(const glm::mat3 &matrix) {
+    glUniformMatrix3fv(normal_matrix, 1, GL_FALSE, &matrix[0][0]);
 }
