@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "../../utils/utils.h"
 #include <time.h>
 const unsigned int INTERVAL = 17;// 60 per sec
 const unsigned int WIDTH    = 800;
