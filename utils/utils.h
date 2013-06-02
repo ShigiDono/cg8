@@ -9,6 +9,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <vector>
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif//_USE_MATH_DEFINES
+#include <math.h>
+
 
 struct shader_t {
     shader_t(const char * vertex_file_path, const char * fragment_file_path);

@@ -1,9 +1,5 @@
 #include "../../utils/utils.h"
 #include <time.h>
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif//_USE_MATH_DEFINES
-#include <math.h>
 const unsigned int INTERVAL = 17;// 60 per sec
 const unsigned int WIDTH    = 800;
 const unsigned int HEIGHT   = 600;
