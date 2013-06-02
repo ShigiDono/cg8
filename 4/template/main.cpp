@@ -27,11 +27,11 @@ void display() {
 	// Use our shader
 
 	// 1rst attribute buffer : vertices
-    glm::mat4 model = glm::rotate(main_shader->view, 60.0f*clock()/CLOCKS_PER_SEC, glm::vec3(0.0, 1.0, 1.0));//60 degrees per sec
+    glm::mat4 model = glm::rotate(main_shader->view, 60.0f*clock()/CLOCKS_PER_SEC, glm::vec3(0.0, 1.0, 0.0));//60 degrees per sec
 
     glUniform3f(lightDir, light_vec.x, light_vec.y, light_vec.z);
 
-    triangle->draw_indexed(model, GL_TRIANGLES, triangle->count);
+    triangle->draw(model, GL_TRIANGLES, triangle->count);
 /*    main_shader->set_view_matrix(model);
 
     main_shader->bind();
@@ -69,7 +69,7 @@ void init() {
     glDepthFunc(GL_LESS);
     glViewport(0, 0, WIDTH, HEIGHT);
     glm::mat4 projection = glm::perspectiveFov(45.0f, (float)WIDTH, (float)HEIGHT, .01f, 100.0f);
-    glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 5), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+    glm::mat4 view = glm::lookAt(glm::vec3(0, 3, 10), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
     main_shader = new shader_t("shader.vs", "shader.fs");
     main_shader->set_projection_matrix(projection);
     main_shader->set_view_matrix(view);
@@ -86,11 +86,13 @@ void init() {
     std::vector<float> tmp_norm;
     std::vector<float> tmp_colr;
 
-    std::vector<unsigned short> tmp_indx;
+    std::vector<unsigned int> tmp_indx;
+
+    triangle = loadOBJ("scenery.obj", main_shader);
 
     // sphere in radial coordinates
     // may be optimized even more
-    for (int i = 0; i < sphere_vertical_segs; ++i) {
+    /*for (int i = 0; i < sphere_vertical_segs; ++i) {
         float y1 = cos(M_PI*i/sphere_vertical_segs);
         float y2 = cos(M_PI*(i + 1)/sphere_vertical_segs);
         float _y1 = sin(M_PI*i/sphere_vertical_segs);
@@ -124,16 +126,34 @@ void init() {
         }
     }
 
-    buffer_t *vertex_buffer = new buffer_t(0, &tmp_mesh[0], tmp_mesh.size());
-    buffer_t *norm_buffer = new buffer_t(1, &tmp_norm[0], tmp_norm.size());
-    buffer_t *indx_buffer = new buffer_t(&tmp_indx[0], tmp_indx.size());
+    GLfloat *mesh = new GLfloat[tmp_mesh.size()];
+    GLfloat *norm = new GLfloat[tmp_norm.size()];
+
+    GLushort *indx = new GLushort[tmp_norm.size()];
+
+    for (int i = 0; i < tmp_mesh.size(); ++i) {
+        mesh[i] = tmp_mesh[i];
+    }
+    for (int i = 0; i < tmp_norm.size(); ++i) {
+        norm[i] = tmp_norm[i];
+    }
+    for (int i = 0; i < tmp_indx.size(); ++i) {
+        indx[i] = tmp_indx[i];
+    }
+
+    buffer_t *vertex_buffer = new buffer_t(0, mesh, tmp_mesh.size());
+    buffer_t *norm_buffer = new buffer_t(1, norm, tmp_norm.size());
+    buffer_t *indx_buffer = new buffer_t(indx, tmp_indx.size());
+    delete[] mesh;
+    delete[] norm;
+    delete[] indx;
 
     triangle = new model_t(main_shader);
 
     triangle->buffers.push_back(indx_buffer);
     triangle->buffers.push_back(vertex_buffer);
     triangle->buffers.push_back(norm_buffer);
-    triangle->count = tmp_indx.size();
+    triangle->count = tmp_indx.size();*/
 
 
 }

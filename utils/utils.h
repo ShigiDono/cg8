@@ -52,6 +52,8 @@ struct model_t {
     void draw_indexed(glm::mat4 matrix, GLuint primitive_kind, GLuint count);
 };
 
+model_t *loadOBJ(const char * path, shader_t *shader);
+
 
 
 buffer_t create_vertex_array(GLuint attribute, GLfloat *vertices, unsigned int count, unsigned int size = 3);
